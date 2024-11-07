@@ -7,7 +7,7 @@ const metRecordEndpoint = 'https://collectionapi.metmuseum.org/public/collection
 
 const articSearchEndpoint = `${articEndpoint}/search?q=`;
 const europeanaSearchEndpoint = '/api/v2/search.json';
-const RESULTS_PER_PAGE = 20; 
+const RESULTS_PER_PAGE = 12; 
 
 const europeanaFilters = [
     'europeana_id',
@@ -126,7 +126,8 @@ function standardizeArtworkData(data, source) {
 
 async function searchEuropeana(query, page = 1) {
     try {
-        const baseParams = `wskey=${EUROPEANA_API_KEY}&query=${encodeURIComponent(query)}&profile=rich&page=${page}&rows=${RESULTS_PER_PAGE}`;
+		const startIndex = (page - 1) * RESULTS_PER_PAGE;
+        const baseParams = `wskey=${EUROPEANA_API_KEY}&query=${encodeURIComponent(query)}&profile=rich&page=${startIndex}&rows=${RESULTS_PER_PAGE}`;
         const additionalParams = '&theme=art&reusability=open&media=true&thumbnail=true';
         const url = `${europeanaEndpoint}${europeanaSearchEndpoint}?${baseParams}${additionalParams}`;
 
@@ -171,7 +172,7 @@ async function searchArtic(query, page = 1) {
 
 async function searchMet(query, page = 1) {
     try {
-        // First, get the object IDs
+      
         const searchParams = new URLSearchParams({
             q: query,
             hasImages: true
@@ -183,11 +184,11 @@ async function searchMet(query, page = 1) {
         const searchData = await searchResponse.json();
         if (!searchData.objectIDs) return [];
 
-        // Calculate pagination
+  
         const startIndex = (page - 1) * RESULTS_PER_PAGE;
+		
         const pageIds = searchData.objectIDs.slice(startIndex, startIndex + RESULTS_PER_PAGE);
-
-        // Fetch details for each object
+		console.log("rawdata",searchData, 'paginated', pageIds)
         const detailPromises = pageIds.map(async (objectId) => {
             try {
                 const detailResponse = await fetch(`${metRecordEndpoint}/${objectId}`);
@@ -218,7 +219,6 @@ async function searchArtworks(query, page = 1) {
             searchMet(query, page)
         ]);
 
-        // Combine and filter results
         const allResults = [
             ...europeanaResults,
             ...articResults,

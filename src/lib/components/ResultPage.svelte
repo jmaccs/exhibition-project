@@ -4,7 +4,7 @@
 
 <div class="container mx-auto px-4 py-8">
     <button
-        on:click={onBack}
+        onclick={onBack}
         class="mb-6 flex items-center gap-2 rounded-md bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-200"
     >
         <span>← Back to Search</span>
@@ -17,7 +17,7 @@
                     src={artwork.image}
                     alt={artwork.title}
                     class="h-full w-full rounded-lg object-contain"
-                    on:error={(e) => (e.target.src = 'https://via.placeholder.com/600x600?text=No+Image')}
+                    onerror={(e) => (e.target.src = 'https://via.placeholder.com/600x600?text=No+Image')}
                 />
             {:else}
                 <div class="flex h-full w-full items-center justify-center rounded-lg bg-gray-200 text-gray-500">
