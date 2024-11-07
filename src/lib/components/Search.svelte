@@ -5,18 +5,22 @@
 	import ResultPage from './ResultPage.svelte';
 	import { crossfade } from 'svelte/transition';
 	import Book from './Book.svelte';
-
+	let filter = $state('');
 	let query = $state('');
-	let results = $state([]);
+	let allResults = $state([]);
 	let isLoading = $state(false);
 	let error = $state(null);
 	let currentPage = $state(1);
+	let itemsPerPage = $state(20);
 
-	let hasMore = $state(false);
 	let showSearch = $state(true);
 	let selectedArtwork = $state(null);
 
-	const RESULTS_PER_PAGE = 36;
+	let totalPages = $derived(Math.ceil(allResults.length / itemsPerPage));
+	let displayedResults = $derived(allResults.slice(
+		(currentPage - 1) * itemsPerPage,
+		currentPage * itemsPerPage
+	));
 
 	async function search(page = 1) {
 		if (!query.trim()) return;
@@ -24,25 +28,10 @@
 		isLoading = true;
 		error = null;
 
-		if (page === 1) {
-			results = [];
-		}
-
 		try {
-			const searchResults = await api.searchArtworks(query, page);
-
-			console.log('Search results:', searchResults);
-
-			if (searchResults.length === 0 && page === 1) {
-				console.log('No results found');
-			} else {
-				if (page === 1) {
-					results = searchResults;
-				} else {
-					results = [...results, ...searchResults];
-				}
-				hasMore = searchResults.length === RESULTS_PER_PAGE;
-			}
+			const searchData = await api.searchArtworks(query, page, filter);
+			allResults = searchData.results;
+			currentPage = page;
 		} catch (err) {
 			console.error('Search error:', err);
 			if (err.message.includes('401') || err.message.includes('403')) {
@@ -60,23 +49,16 @@
 
 	function handleKeyDown(event) {
 		if (event.key === 'Enter' && !isLoading) {
-			currentPage = 1;
 			search(1);
 		}
 	}
 
-	function loadMore() {
-		if (!isLoading && hasMore) {
-			currentPage++;
-			search(currentPage);
+	async function loadPage(page) {
+		if (!isLoading && page >= 1 && page <= totalPages) {
+			await search(page);
 		}
 	}
-	function loadLess() {
-		if (!isLoading && currentPage > 1) {
-			currentPage--;
-			search(currentPage);
-		}
-	}
+
 	function handleArtworkSelect(artwork) {
 		selectedArtwork = artwork;
 		showSearch = false;
@@ -91,26 +73,28 @@
 {#if showSearch}
 	<div class="flex h-full w-full flex-col items-center justify-center p-4">
 		<div class="flex w-full max-w-6xl flex-col items-center justify-center gap-4">
-	
-		
 			<div class="w-full max-w-2xl">
 				<input
 					type="text"
 					placeholder="Search for artworks"
-					class="h-12 w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-center text-lg text-gray-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+					class="h-12 w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-center text-lg text-gray-800  focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 "
 					bind:value={query}
 					onkeydown={handleKeyDown}
 				/>
 				<button
 					class="mt-4 h-12 w-full rounded-md bg-indigo-500 px-4 py-2 text-center text-lg text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
-					onclick={() => {
-						currentPage = 1;
-						search(1);
-					}}
+					onclick={() => search(1)}
 					disabled={isLoading}
 				>
 					{isLoading ? 'Searching...' : 'Search'}
 				</button>
+				<label for="filter-select"></label>
+				<select class="appearance-none row-start-1 col-start-1 bg-slate-50" bind:value={filter}>
+					<option value="">--Please choose an option--</option>
+					<option value="artist">Artist</option>
+					<option value="title">Title</option>
+					<option value="medium">Medium</option>
+				  </select>
 			</div>
 
 			{#if error}
@@ -119,9 +103,9 @@
 				</div>
 			{/if}
 
-			{#if results.length > 0}
+			{#if displayedResults.length > 0}
 				<div class="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-					{#each results as result, i (result.id)}
+					{#each displayedResults as result, i (result.id)}
 						<button
 							type="button"
 							class="aspect-square relative bg-gray-100"
@@ -134,18 +118,23 @@
 					{/each}
 				</div>
 
-				<div class="mt-4 flex justify-center">
+				<div class="mt-4 flex items-center justify-center gap-4">
 					<button
-						class="mr-2 rounded-md bg-gray-200 px-4 py-2 hover:bg-gray-300 disabled:opacity-50"
+						class="rounded-md bg-gray-200 px-4 py-2 hover:bg-gray-300 disabled:opacity-50"
 						disabled={currentPage === 1}
-						onclick={loadLess}
+						onclick={() => loadPage(currentPage - 1)}
 					>
 						Previous
 					</button>
 
+					<span class="text-gray-700">
+						Page {currentPage} of {totalPages}
+					</span>
+
 					<button
-						class="ml-2 rounded-md bg-gray-200 px-4 py-2 hover:bg-gray-300 disabled:opacity-50"
-						onclick={loadMore}
+						class="rounded-md bg-gray-200 px-4 py-2 hover:bg-gray-300 disabled:opacity-50"
+						disabled={currentPage === totalPages}
+						onclick={() => loadPage(currentPage + 1)}
 					>
 						Next
 					</button>
