@@ -233,7 +233,6 @@ async function searchMet(query, filter = '') {
 			hasImages: true
 		});
 		if (filter !== '') {
-			
 			searchParams = new URLSearchParams({
 				[filters[filter].met]: true,
 				q: query,
@@ -256,7 +255,7 @@ async function searchMet(query, filter = '') {
 			};
 		}
 		console.log('metSearchCache', metSearchCache);
-		const pageIds = metSearchCache.objectIDs.slice(0, RESULTS_PER_PAGE);
+		const pageIds = metSearchCache.objectIDs
 
 		const detailPromises = pageIds.map(async (objectId) => {
 			try {
