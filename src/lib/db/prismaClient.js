@@ -3,8 +3,8 @@ import 'dotenv/config';
 import { PrismaLibSQL } from '@prisma/adapter-libsql';
 import { createClient } from '@libsql/client';
 
-const authToken = process.env.VITE_TURSO_DB_AUTH_TOKEN
-const url = process.env.VITE_TURSO_DB_URL
+const authToken = import.meta.env.VITE_TURSO_DB_AUTH_TOKEN
+const url = import.meta.env.VITE_TURSO_DB_URL
 
 const libsql = createClient({
 	url: url,
