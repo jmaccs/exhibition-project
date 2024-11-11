@@ -1,8 +1,9 @@
 <script>
 	export let result;
+	export let isLoading = false;
 </script>
 
-<div class="rounded-lg border shadow-sm transition-shadow hover:shadow-md">
+<div class="rounded-lg border shadow-sm transition-shadow hover:shadow-md relative">
 	<div class="aspect-square relative bg-gray-100">
 		<div class="overflow-hidden rounded-lg border shadow-sm transition-shadow hover:shadow-md">
 			{#if result.thumbnail}
@@ -24,14 +25,23 @@
 		{#if result.creator}
 			<p class="line-clamp-1 text-sm text-gray-600" title={result.creator}>By {result.creator}</p>
 		{/if}
-		<div class="mt-1">
+		<div class="mt-1 flex justify-between items-center">
 			<span class="text-xs text-gray-500">
 				{#if result.source === 'artic'}
 					Art Institute Chicago
 				{:else}
-					{result.provider || result.source}
+					The Metropolitan Museum of Art
 				{/if}
 			</span>
+			{#if isLoading}
+				<span class="text-xs text-indigo-500">Loading details...</span>
+			{/if}
 		</div>
 	</div>
+
+	{#if isLoading}
+		<div class="absolute inset-0 bg-white/50 flex items-center justify-center">
+			<div class="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+		</div>
+	{/if}
 </div>

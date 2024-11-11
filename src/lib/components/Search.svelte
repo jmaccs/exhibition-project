@@ -5,6 +5,7 @@
 	import ResultPage from './ResultPage.svelte';
 	import { crossfade } from 'svelte/transition';
 	import Book from './Book.svelte';
+
 	let filter = $state('');
 	let query = $state('');
 	let allResults = $state([]);
@@ -12,6 +13,8 @@
 	let error = $state(null);
 	let currentPage = $state(1);
 	let itemsPerPage = $state(20);
+	let detailedArtworks = $state(new Map());
+	let loadingDetails = $state(new Set());
 
 	let showSearch = $state(true);
 	let selectedArtwork = $state(null);
@@ -22,6 +25,36 @@
 		currentPage * itemsPerPage
 	));
 
+
+	$effect(() => {
+		if (displayedResults.length > 0) {
+			fetchDetailsForCurrentPage();
+		}
+	});
+
+	async function fetchDetailsForCurrentPage() {
+		for (const artwork of displayedResults) {
+			if (!detailedArtworks.has(artwork.id) && !loadingDetails.has(artwork.id)) {
+				loadingDetails.add(artwork.id);
+				
+				try {
+					const detailFetcher = artwork.source === 'artic' 
+						? api.fetchArticDetail 
+						: api.fetchMetDetail;
+					
+					const details = await detailFetcher(artwork.id);
+					if (details) {
+						detailedArtworks.set(artwork.id, details);
+					}
+				} catch (err) {
+					console.error(`Error fetching details for artwork ${artwork.id}:`, err);
+				} finally {
+					loadingDetails.delete(artwork.id);
+				}
+			}
+		}
+	}
+
 	async function search(page = 1) {
 		if (!query.trim()) return;
 
@@ -29,16 +62,19 @@
 		error = null;
 
 		try {
-			const searchData = await api.searchArtworks(query, page, filter);
+			const searchData = await api.searchArtworks(query, filter);
 			allResults = searchData.results;
 			currentPage = page;
+			
+		
+			detailedArtworks.clear();
+			loadingDetails.clear();
 		} catch (err) {
 			console.error('Search error:', err);
 			if (err.message.includes('401') || err.message.includes('403')) {
 				error = 'API authentication error. Please check your API key.';
 			} else if (err.message.includes('CORS')) {
-				error =
-					'CORS error: Unable to access the API. Please check the API endpoint configuration.';
+				error = 'CORS error: Unable to access the API. Please check the API endpoint configuration.';
 			} else {
 				error = `Search error: ${err.message}`;
 			}
@@ -53,14 +89,21 @@
 		}
 	}
 
-	async function loadPage(page) {
-		if (!isLoading && page >= 1 && page <= totalPages) {
-			await search(page);
+	function previousPage() {
+		if (currentPage > 1) {
+			currentPage--;
+		}
+	}
+
+	function nextPage() {
+		if (currentPage < totalPages) {
+			currentPage++;
 		}
 	}
 
 	function handleArtworkSelect(artwork) {
-		selectedArtwork = artwork;
+		// If we have detailed data, use it, otherwise use basic data
+		selectedArtwork = detailedArtworks.get(artwork.id) || artwork;
 		showSearch = false;
 	}
 
@@ -77,7 +120,7 @@
 				<input
 					type="text"
 					placeholder="Search for artworks"
-					class="h-12 w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-center text-lg text-gray-800  focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 "
+					class="h-12 w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-center text-lg text-gray-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
 					bind:value={query}
 					onkeydown={handleKeyDown}
 				/>
@@ -88,13 +131,17 @@
 				>
 					{isLoading ? 'Searching...' : 'Search'}
 				</button>
-				<label for="filter-select"></label>
-				<select class="appearance-none row-start-1 col-start-1 bg-slate-50" bind:value={filter}>
+				<label for="filter-select" class="sr-only">Filter search by</label>
+				<select 
+					id="filter-select"
+					class="mt-4 w-full h-12 rounded-md border border-gray-200 bg-white px-4 py-2 text-gray-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+					bind:value={filter}
+				>
 					<option value="">--Please choose an option--</option>
 					<option value="artist">Artist</option>
 					<option value="title">Title</option>
 					<option value="medium">Medium</option>
-				  </select>
+				</select>
 			</div>
 
 			{#if error}
@@ -113,7 +160,10 @@
 							out:crossfade={{ key: result.id }}
 							onclick={() => handleArtworkSelect(result)}
 						>
-							<Results {result} />
+							<Results 
+								result={detailedArtworks.get(result.id) || result} 
+								isLoading={loadingDetails.has(result.id)}
+							/>
 						</button>
 					{/each}
 				</div>
@@ -122,7 +172,7 @@
 					<button
 						class="rounded-md bg-gray-200 px-4 py-2 hover:bg-gray-300 disabled:opacity-50"
 						disabled={currentPage === 1}
-						onclick={() => loadPage(currentPage - 1)}
+						onclick={previousPage}
 					>
 						Previous
 					</button>
@@ -134,7 +184,7 @@
 					<button
 						class="rounded-md bg-gray-200 px-4 py-2 hover:bg-gray-300 disabled:opacity-50"
 						disabled={currentPage === totalPages}
-						onclick={() => loadPage(currentPage + 1)}
+						onclick={nextPage}
 					>
 						Next
 					</button>
