@@ -37,7 +37,7 @@ function standardizeArtworkData(data, source) {
 					? `https://www.artic.edu/iiif/2/${data.image_id}/full/843,/0/default.jpg`
 					: null,
 				thumbnail: data.image_id
-					? `https://www.artic.edu/iiif/2/${data.image_id}/full/200,/0/default.jpg`
+					? `https://www.artic.edu/iiif/2/${data.image_id}/full/400,/0/default.jpg`
 					: null,
 				provider: 'Art Institute of Chicago',
 				rights: data.copyright_notice || '',
@@ -79,7 +79,6 @@ async function searchArtic(query, filter = '') {
 			limit: 100,
 			is_public_domain: true,
 			fields: ['id', 'title', 'image_id', 'artist_display'].join(',')
-
 		});
 
 		const response = await fetch(`${articSearchEndpoint}${params}`);
@@ -87,10 +86,12 @@ async function searchArtic(query, filter = '') {
 
 		const data = await response.json();
 		return {
-			results: (data.data || []).map(item => ({
+			results: (data.data || []).map((item) => ({
 				id: item.id,
 				title: item.title || 'Untitled',
-				thumbnail: item.image_id ? `https://www.artic.edu/iiif/2/${item.image_id}/full/200,/0/default.jpg` : null,
+				thumbnail: item.image_id
+					? `https://www.artic.edu/iiif/2/${item.image_id}/full/200,/0/default.jpg`
+					: null,
 				creator: item.artist_display || 'Unknown',
 				source: 'artic'
 			})),
@@ -106,10 +107,9 @@ async function searchMet(query, filter = '') {
 	try {
 		let searchParams = new URLSearchParams({
 			q: query,
-			hasImages: true,
-
+			hasImages: true
 		});
-		
+
 		if (filter !== '' && filters[filter].met) {
 			searchParams.append(filters[filter].met, true);
 		}
@@ -119,27 +119,25 @@ async function searchMet(query, filter = '') {
 		if (!response.ok) throw new Error(`Met Search API error: ${response.status}`);
 
 		const data = await response.json();
-		
-		
-		const detailPromises = (data.objectIDs || [])
-			.slice(0, 50)
-			.map(id => fetch(`${metRecordEndpoint}/${id}`)
-				.then(res => res.json())
-				.catch(() => null)
-			);
 
+		const detailPromises = (data.objectIDs || []).slice(0, 50).map((id) =>
+			fetch(`${metRecordEndpoint}/${id}`)
+				.then((res) => res.json())
+				.catch(() => null)
+		);
+		console.log('metdetailPromises', detailPromises);
 		const details = await Promise.all(detailPromises);
 		const results = details
-			.filter(item => item !== null)
-			.filter(item => item.isPublicDomain === true)
-			.map(item => ({
+			.filter((item) => item !== null)
+			.filter((item) => item.isPublicDomain === true)
+			.map((item) => ({
 				id: item.objectID,
 				title: item.title || 'Untitled',
 				thumbnail: item.primaryImageSmall,
 				creator: item.artistDisplayName || 'Unknown',
 				source: 'met'
 			}));
-
+			console.log('metResults', results);
 		return {
 			results,
 			total: data.total || 0
@@ -152,13 +150,23 @@ async function searchMet(query, filter = '') {
 
 async function searchArtworks(query, filter = '') {
 	try {
+		if (query === '*') {
+			const articRes= await fetch(`${articEndpoint}`);
+			const metRes = await fetch(`${metRecordEndpoint}`)
+			const articData = await articRes.json();
+			const metData = await metRes.json();
+			console.log('articTotal', articData, 'metTotal', metData);
+			return articData.pagination.total + metData.total;
+		}
+
 		const [articData, metData] = await Promise.all([
 			searchArtic(query, filter),
 			searchMet(query, filter)
 		]);
 
-		const allResults = [...articData.results, ...metData.results]
-			.filter(item => item.thumbnail !== null);
+		const allResults = [...articData.results, ...metData.results].filter(
+			(item) => item.thumbnail !== null
+		);
 
 		return {
 			results: allResults,

@@ -2,5 +2,9 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-@layer components {
+@font-face {
+    font-family: Catrinity;
+    font-style: normal;
+    font-weight: 400;
+    src: url('/fonts/Catrinity-Regular.otf') format('otf');
 }

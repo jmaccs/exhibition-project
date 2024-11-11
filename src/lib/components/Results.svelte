@@ -25,7 +25,7 @@
 		{#if result.creator}
 			<p class="line-clamp-1 text-sm text-gray-600" title={result.creator}>By {result.creator}</p>
 		{/if}
-		<div class="mt-1 flex justify-between items-center">
+		<div class="mt-1 flex justify-center items-center">
 			<span class="text-xs text-gray-500">
 				{#if result.source === 'artic'}
 					Art Institute Chicago
