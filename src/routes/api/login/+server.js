@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
-import { prisma } from '$lib/db/prismaClient';
+import { tursoClient } from '$lib/db/prismaClient';
 import bcrypt from 'bcryptjs';
-
+const prisma = tursoClient();
 
 export async function POST({ request }) {
     try {

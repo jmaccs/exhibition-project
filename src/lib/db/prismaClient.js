@@ -1,17 +1,26 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
+import 'dotenv/config'
+import { PrismaLibSQL } from '@prisma/adapter-libsql';
+import { createClient } from '@libsql/client';
+export function tursoClient() {
+	const authToken = import.meta.env.VITE_TURSO_DB_AUTH_TOKEN;
+	const url = import.meta.env.VITE_TURSO_DB_URL;
+	if (url === undefined) {
+		throw new Error('TURSO_URL is not defined', url);
+	}
+	if (authToken === undefined) {
+		if (!url.includes('file:')) {
+			throw new Error('TURSO_AUTH_TOKEN is not defined');
+		}
+	}
+	const libsql = createClient({
+		url: url,
+		authToken: authToken
+	});
 
-// 1. Import libSQL and the Prisma libSQL driver adapter
-import { PrismaLibSQL } from '@prisma/adapter-libsql'
-import { createClient } from '@libsql/client'
-
-// 2. Instantiate libSQL
-const libsql = createClient({
-  // @ts-expect-error
-  url: process.env.TURSO_DATABASE_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN
-})
-
-// 3. Instantiate the libSQL driver adapter
- const adapter = new PrismaLibSQL(libsql)
-// Pass the adapter option to the Prisma Client instance
-export const prisma = new PrismaClient({ adapter })
+	// 3. Instantiate the libSQL driver adapter
+	const adapter = new PrismaLibSQL(libsql);
+	// Pass the adapter option to the Prisma Client instance
+	const prisma = new PrismaClient({ adapter });
+	return prisma;
+}

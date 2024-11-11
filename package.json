@@ -11,6 +11,7 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
+		"@sveltejs/adapter-vercel": "^5.4.7",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0",
 		"@tailwindcss/aspect-ratio": "^0.4.2",
@@ -34,6 +35,7 @@
 		"@libsql/client": "^0.8.1",
 		"@prisma/adapter-libsql": "^5.22.0",
 		"@prisma/client": "^5.22.0",
-		"bcryptjs": "^2.4.3"
+		"bcryptjs": "^2.4.3",
+		"dotenv": "^16.4.5"
 	}
 }
