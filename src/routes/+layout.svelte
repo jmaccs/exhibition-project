@@ -3,7 +3,7 @@
 	import '../app.css';
 	let { children } = $props();
 	
-	console.log(allUsers);
+
 </script>
 
 <nav>
