@@ -1,27 +1,27 @@
 <script>
+	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
-	// import { createPlaceholder } from '$lib/components/placeholder.js';
 	let { data } = $props();
-	// const loading = createPlaceholder({
-	// 	placeholders: ['.....'],
-	// 	element: '#loading',
-	// 	speed: 100,
-	// 	stay: 500,
-	// 	preText: 'Loading'
-	// });
+	let formMessage = $state('');
+	let formError = $state(false);
 
-	function addToCollection() {
-		console.log('add to collection');
+	function handleSubmit() {
+		return async ({ result }) => {
+			if (result.type === 'failure') {
+				formError = true;
+				formMessage = result.data?.message || 'Failed to add to collection';
+			} else if (result.type === 'success') {
+				formError = false;
+				formMessage = 'Successfully added to collection!';
+				setTimeout(() => {
+					goto('/collection');
+				}, 1500);
+			}
+		};
 	}
 </script>
 
-<div class="container  mx-auto px-4 py-8">
-    <a
-    href="/search"
-    class="w-8 h-auto mb-6 items-center gap-2 rounded-md bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-400"
->
-← Back to Search
-</a>
+<div class="container mx-auto px-4 py-8">
 	{#await data}
 		<div role="status">
 			<svg
@@ -42,12 +42,10 @@
 			</svg>
 			<span class="sr-only">Loading...</span>
 		</div>
-
 	{:then data}
 		{@const artwork = data.artwork}
 		<div class="grid gap-8 md:grid-cols-2">
 			<div class="flex-col justify-items-center">
-			
 				<div class="aspect-square relative">
 					{#if artwork.image}
 						<img
@@ -64,12 +62,24 @@
 						</div>
 					{/if}
 				</div>
-				<button
-					class="mt-8 rounded-full bg-blue-600 p-4 text-white hover:bg-blue-200 hover:text-gray-700"
-					onclick={addToCollection}
-				>
-					Add to personal collection
-				</button>
+				<form action="?/addToCollection" method="POST" use:enhance={handleSubmit}>
+					<input 
+						type="hidden"
+						name="artwork"
+						value={JSON.stringify(artwork)}
+					/>
+					<button 
+						type="submit" 
+						class="mt-8 w-full rounded-lg bg-blue-600 p-4 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+					>
+						Add to personal collection
+					</button>
+					{#if formMessage}
+						<div class={`mt-4 p-4 rounded-lg ${formError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+							{formMessage}
+						</div>
+					{/if}
+				</form>
 			</div>
 			<div>
 				<h1 class="mb-4 font-sans text-xl font-bold xl:text-2xl">{artwork.title}</h1>
@@ -77,7 +87,7 @@
 					<p class="text-l mb-4 font-sans text-gray-600 xl:text-xl">By {artwork.creator}</p>
 				{/if}
 				{#if artwork.description}
-					<div class="mb-6">
+					<div class="bg-white border border-dashed rounded-lg p-4 mb-6">
 						<h2 class="text-md xl:text-l mb-2 font-sans">Description</h2>
 						<article class="prose-xs font-sans lg:prose-sm">
 							{@html artwork.description}
@@ -109,5 +119,15 @@
 			</div>
 		</div>
 	{/await}
-
+	<div class="mt-8">
+		<hr class="dashed">
+		<div class="mt-8">
+			<a
+				href="/search"
+				class="w-8 h-auto mb-6 items-center gap-2 rounded-md bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-400"
+			>
+				← Back to Search
+			</a>
+		</div>
+	</div>
 </div>
