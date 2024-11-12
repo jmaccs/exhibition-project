@@ -1,5 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfigm loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 import dotenv from 'dotenv'
 
 dotenv.config()

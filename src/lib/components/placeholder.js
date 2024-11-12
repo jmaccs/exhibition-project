@@ -1,17 +1,17 @@
 import { writable } from 'svelte/store';
 import { tick } from 'svelte';
 
-export function createPlaceholder({ placeholders, element, speed, stay, preText }) {
+export function createTextCycler({ texts, element, speed, stay, preText = '' }) {
   const { subscribe, set } = writable('');
   
   let charIdx = 0;
-  let placeholderIdx = 0;
+  let textIdx = 0;
   let intervalId;
 
-  async function setPlaceholder() {
-    let placeholder = placeholders[placeholderIdx];
-    let placeholderChunk = placeholder.substring(0, charIdx + 1);
-    document.querySelector(element).setAttribute('placeholder', preText + ' ' + placeholderChunk);
+  async function setTextContent() {
+    const text = texts[textIdx];
+    const textChunk = text.substring(0, charIdx + 1);
+    document.querySelector(element).textContent = preText + ' ' + textChunk;
     await tick();
   }
 
@@ -21,7 +21,7 @@ export function createPlaceholder({ placeholders, element, speed, stay, preText 
       clearInterval(intervalId);
       init(); 
     } else {
-      setPlaceholder();
+      setTextContent();
       charIdx--;
       await tick();
     }
@@ -32,17 +32,17 @@ export function createPlaceholder({ placeholders, element, speed, stay, preText 
     intervalId = setInterval(() => {
       onTickReverse(() => {
         charIdx = 0;
-        placeholderIdx = (placeholderIdx + 1) % placeholders.length;
+        textIdx = (textIdx + 1) % texts.length;
       });
     }, speed);
   }
 
   async function onTick() {
-    let placeholder = placeholders[placeholderIdx];
-    if (charIdx === placeholder.length) {
+    const text = texts[textIdx];
+    if (charIdx === text.length) {
       setTimeout(goReverse, stay);
     }
-    setPlaceholder();
+    setTextContent();
     charIdx++;
     await tick();
   }

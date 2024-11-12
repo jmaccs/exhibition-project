@@ -39,7 +39,7 @@ async function seed() {
         console.log('👥 Inserting seed users...');
         await db.insert(users).values(seedUsers);
         
-        // Verify the insertion
+    
         const insertedUsers = await db.select({
             name: users.name,
             email: users.email

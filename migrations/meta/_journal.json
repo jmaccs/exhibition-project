@@ -8,6 +8,13 @@
       "when": 1731309545197,
       "tag": "0000_flowery_colossus",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1731419854996,
+      "tag": "0001_white_gambit",
+      "breakpoints": true
     }
   ]
 }

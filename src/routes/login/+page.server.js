@@ -1,63 +1,80 @@
-import { json } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import { db } from '$lib/db/db';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
 import { users } from '$lib/db/schema';
 
-
 export const actions = {
-    login: async (request) =>{
+    login: async ({ request, cookies }) => {
+        const data = await request.formData();
+        const email = data.get('email');
+        const password = data.get('password');
+
+        if (!email || !password) {
+            return fail(400, { message: 'Missing email or password' });
+        }
+
         try {
-            const { email, password } = await request.json();
-    
             const [user] = await db
                 .select()
                 .from(users)
                 .where(eq(users.email, email))
                 .limit(1);
-    
+
             if (!user) {
-                return json({ message: 'Invalid email or password' }, { status: 401 });
+                return fail(401, { message: 'Invalid email or password' });
             }
-    
+
             const isValidPassword = await bcrypt.compare(password, user.password);
-    
+
             if (!isValidPassword) {
-                return json({ message: 'Invalid email or password' }, { status: 401 });
+                return fail(401, { message: 'Invalid email or password' });
             }
-    
-            return json({
-                user: {
-                    id: user.id,
-                    email: user.email,
-                    name: user.name
-                }
+
+         
+            cookies.set('session', JSON.stringify({
+                id: user.id,
+                email: user.email,
+                name: user.name
+            }), {
+                path: '/',
+                httpOnly: true,
+                sameSite: 'strict',
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 60 * 60 * 24 * 30 
             });
+
+            return { success: true };
         } catch (error) {
             console.error('Login error:', error);
-            return json({ message: 'Internal server error' }, { status: 500 });
+            return fail(500, { message: 'Internal server error' });
         }
     },
-    signUp: async (request) => {
+
+    signUp: async ({ request, cookies }) => {
+        const data = await request.formData();
+        const email = data.get('email');
+        const password = data.get('password');
+        const name = data.get('name');
+
+        if (!email || !password || !name) {
+            return fail(400, { message: 'Missing required fields' });
+        }
+
         try {
-            const { email, password, name } = await request.json();
-    
-          
             const [existingUser] = await db
                 .select()
                 .from(users)
                 .where(eq(users.email, email))
                 .limit(1);
-    
+
             if (existingUser) {
-                return json({ message: 'Email already registered' }, { status: 400 });
+                return fail(400, { message: 'Email already registered' });
             }
-    
-           
+
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
-    
-            // Create new user
+
             const [user] = await db
                 .insert(users)
                 .values({
@@ -70,11 +87,24 @@ export const actions = {
                     email: users.email,
                     name: users.name
                 });
-    
-            return json({ user });
+
+           
+            cookies.set('session', JSON.stringify({
+                id: user.id,
+                email: user.email,
+                name: user.name
+            }), {
+                path: '/',
+                httpOnly: true,
+                sameSite: 'strict',
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 60 * 60 * 24 * 30 
+            });
+
+            return { success: true };
         } catch (error) {
             console.error('Signup error:', error);
-            return json({ message: 'Internal server error' }, { status: 500 });
+            return fail(500, { message: 'Internal server error' });
         }
     }
-}
+};

@@ -224,7 +224,8 @@ async function fetchMetDetail(id) {
 const api = {
 	searchArtworks,
 	fetchArticDetail,
-	fetchMetDetail
+	fetchMetDetail,
+	standardizeArtworkData
 };
 
 export default api;
