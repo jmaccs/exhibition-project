@@ -1,12 +1,21 @@
+import { verifyJWT } from '$lib/jwt';
+
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
-    const session = event.cookies.get('session');
+    const token = event.cookies.get('authToken');
     
-    if (session) {
+    if (token) {
         try {
-            event.locals.user = JSON.parse(session);
+            const userData = verifyJWT(token);
+            if (userData) {
+                event.locals.user = {
+                    id: userData.id,
+                    email: userData.email,
+                    name: userData.name
+                };
+            }
         } catch {
-            event.cookies.delete('session', { path: '/' });
+            event.cookies.delete('authToken', { path: '/' });
         }
     }
 

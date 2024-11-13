@@ -109,7 +109,7 @@ export const actions = {
                 name: newUser.name
             });
 
-            // Set cookie with JWT
+          
             cookies.set('authToken', token, {
                 path: '/',
                 httpOnly: true,

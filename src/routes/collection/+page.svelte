@@ -80,14 +80,14 @@
 </style>
 
 <div class="container mx-auto px-4 py-8">
-    <h1 class="mb-8 text-2xl font-bold">My Collection</h1>
+    <h1 class="mb-8 text-2xl font-bold font-sans">My Collection</h1>
 
     {#if data.collection.length === 0}
-        <div class="rounded-lg bg-gray-100 p-8 text-center">
+        <div class="rounded-lg bg-gray-100 p-8 text-center font-sans">
             <p class="text-gray-600">Your collection is empty. Start adding artworks from the search page!</p>
             <a 
                 href="/search" 
-                class="mt-4 inline-block rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
+                class="mt-4 inline-block rounded-lg bg-blue-600 px-6 py-2 font-sans text-white hover:bg-blue-700"
             >
                 Search Artworks
             </a>
