@@ -66,7 +66,7 @@ export const load = async({ fetch, params }) => {
             results
         };
     } catch (err) {
-        console.error(`Error loading artwork ${id} from ${source}:`, err);
+        console.error(`Error loading  ${source}:`, err);
         throw error(500, 'Error loading artwork details');
     }
 }

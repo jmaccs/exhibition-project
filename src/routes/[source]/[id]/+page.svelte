@@ -4,9 +4,12 @@
 	let { data } = $props();
 	let formMessage = $state('');
 	let formError = $state(false);
+	let isSubmitting = $state(false);
 
 	function handleSubmit() {
+		isSubmitting = true;
 		return async ({ result }) => {
+			isSubmitting = false;
 			if (result.type === 'failure') {
 				formError = true;
 				formMessage = result.data?.message || 'Failed to add to collection';
@@ -44,6 +47,7 @@
 		</div>
 	{:then data}
 		{@const artwork = data.artwork}
+		{@const user = data.user}
 		<div class="grid gap-8 md:grid-cols-2">
 			<div class="flex-col justify-items-center">
 				<div class="aspect-square relative">
@@ -62,24 +66,41 @@
 						</div>
 					{/if}
 				</div>
-				<form action="?/addToCollection" method="POST" use:enhance={handleSubmit}>
-					<input 
-						type="hidden"
-						name="artwork"
-						value={JSON.stringify(artwork)}
-					/>
-					<button 
-						type="submit" 
-						class="mt-8 w-full rounded-lg bg-blue-600 p-4 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-					>
-						Add to personal collection
-					</button>
-					{#if formMessage}
-						<div class={`mt-4 p-4 rounded-lg ${formError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-							{formMessage}
-						</div>
-					{/if}
-				</form>
+				{#if !user}
+					<div class="mt-8 text-center">
+						<p class="text-gray-600 mb-4">Please log in to add artworks to your collection</p>
+						<a 
+							href="/login" 
+							class="inline-block rounded-lg bg-blue-600 p-4 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+						>
+							Log in
+						</a>
+					</div>
+				{:else}
+					<form action="?/addToCollection" method="POST" use:enhance={handleSubmit}>
+						<input 
+							type="hidden"
+							name="artwork"
+							value={JSON.stringify(artwork)}
+						/>
+						<button 
+							type="submit" 
+							class="mt-8 w-full rounded-lg bg-blue-600 p-4 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+							disabled={isSubmitting}
+						>
+							{#if isSubmitting}
+								Adding to collection...
+							{:else}
+								Add to personal collection
+							{/if}
+						</button>
+						{#if formMessage}
+							<div class={`mt-4 p-4 rounded-lg ${formError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+								{formMessage}
+							</div>
+						{/if}
+					</form>
+				{/if}
 			</div>
 			<div>
 				<h1 class="mb-4 font-sans text-xl font-bold xl:text-2xl">{artwork.title}</h1>

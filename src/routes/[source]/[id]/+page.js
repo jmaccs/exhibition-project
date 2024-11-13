@@ -1,8 +1,10 @@
 import { error } from '@sveltejs/kit';
 import api from '../../../utils/api';
 
-export const load = async({ fetch, params }) => {
+export const load = async({ fetch, params, parent }) => {
+    const parentData = await parent();
     const { source, id } = params;
+    
     const articFields = [
         'id',
         'title',
@@ -21,8 +23,6 @@ export const load = async({ fetch, params }) => {
     if (!source || !id) {
         throw error(404, 'Source and ID are required');
     }
-    
-
 
     if (!['artic', 'met'].includes(source)) {
         throw error(400, 'Invalid source. Must be either "artic" or "met"');
@@ -43,7 +43,8 @@ export const load = async({ fetch, params }) => {
         }
 
         return {
-            artwork
+            artwork,
+            user: parentData.user
         };
     } catch (err) {
         console.error(`Error loading artwork ${id} from ${source}:`, err);
