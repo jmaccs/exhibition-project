@@ -3,7 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { crossfade } from 'svelte/transition';
 	import Results from './Results.svelte';
-
+	import Spinner from './Spinner.svelte';
 	const dispatch = createEventDispatcher();
 
 	export let allApiObjects;
@@ -86,6 +86,11 @@
 		{/if}
 
 		{#if displayedResults.length > 0}
+		{#await displayedResults}
+			<Spinner />
+		{:then displayedResults}
+			
+	
 			<div class="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
 				{#each displayedResults as result, i (result.id)}
 					<button
@@ -102,7 +107,7 @@
 					</button>
 				{/each}
 			</div>
-
+			{/await}
 			<div class="mt-4 flex items-center justify-center gap-4">
 				<button
 					class="rounded-md bg-gray-200 px-4 py-2 hover:bg-gray-300 disabled:opacity-50"
