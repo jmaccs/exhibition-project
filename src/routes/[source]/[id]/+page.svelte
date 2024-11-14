@@ -68,9 +68,9 @@
 				</div>
 				{#if !user}
 					<div class="mt-8 text-center">
-						<p class="text-gray-600 mb-4">Please log in to add artworks to your collection</p>
-						<a 
-							href="/login" 
+						<p class="mb-4 text-gray-600">Please log in to add artworks to your collection</p>
+						<a
+							href="/login"
 							class="inline-block rounded-lg bg-blue-600 p-4 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
 						>
 							Log in
@@ -78,14 +78,10 @@
 					</div>
 				{:else}
 					<form action="?/addToCollection" method="POST" use:enhance={handleSubmit}>
-						<input 
-							type="hidden"
-							name="artwork"
-							value={JSON.stringify(artwork)}
-						/>
-						<button 
-							type="submit" 
-							class="mt-8 w-full rounded-lg bg-blue-600 p-4 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+						<input type="hidden" name="artwork" value={JSON.stringify(artwork)} />
+						<button
+							type="submit"
+							class="mt-8 w-full rounded-lg bg-blue-600 p-4 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
 							disabled={isSubmitting}
 						>
 							{#if isSubmitting}
@@ -95,7 +91,9 @@
 							{/if}
 						</button>
 						{#if formMessage}
-							<div class={`mt-4 p-4 rounded-lg ${formError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+							<div
+								class={`mt-4 rounded-lg p-4 ${formError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}
+							>
 								{formMessage}
 							</div>
 						{/if}
@@ -108,7 +106,7 @@
 					<p class="text-l mb-4 font-sans text-gray-600 xl:text-xl">By {artwork.creator}</p>
 				{/if}
 				{#if artwork.description}
-					<div class="bg-white border border-dashed rounded-lg p-4 mb-6">
+					<div class="mb-6 rounded-lg border border-dashed bg-white p-4">
 						<h2 class="text-md xl:text-l mb-2 font-sans">Description</h2>
 						<article class="prose-xs font-sans lg:prose-sm">
 							{@html artwork.description}
@@ -125,9 +123,11 @@
 					<p class="text-gray-600">
 						<span class="font-semibold">Source:</span>
 						{#if artwork.source === 'artic'}
+							<a href={artwork.link}> Object Link </a>
 							Art Institute of Chicago
 						{:else}
-							{artwork.provider || artwork.source}
+							<a href={artwork.link}> Object Link </a>
+							Metropolitan Museum
 						{/if}
 					</p>
 					{#if artwork.rights}
@@ -141,11 +141,11 @@
 		</div>
 	{/await}
 	<div class="mt-8">
-		<hr class="dashed">
+		<hr class="dashed" />
 		<div class="mt-8">
 			<a
 				href="/search"
-				class="w-8 h-auto mb-6 items-center gap-2 rounded-md bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-400"
+				class="mb-6 h-auto w-8 items-center gap-2 rounded-md bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-400"
 			>
 				← Back to Search
 			</a>

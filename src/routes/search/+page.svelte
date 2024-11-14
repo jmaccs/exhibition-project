@@ -24,10 +24,17 @@
 		if (filter === '')
 			return allResults.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 		else if (filter === 'artist')
-		return allResults.filter(result => result.creator && result.creator.toLowerCase().includes(query.toLowerCase()));
+			return allResults.filter(
+				(result) => result.creator && result.creator.toLowerCase().includes(query.toLowerCase())
+			);
 		else if (filter === 'title')
-		return allResults.filter(result => result.title && result.title.toLowerCase().includes(query.toLowerCase()));
-		else return allResults.filter(result => result.medium && result.medium.toLowerCase().includes(query.toLowerCase()))
+			return allResults.filter(
+				(result) => result.title && result.title.toLowerCase().includes(query.toLowerCase())
+			);
+		else
+			return allResults.filter(
+				(result) => result.medium && result.medium.toLowerCase().includes(query.toLowerCase())
+			);
 	});
 
 	const progress = tweened(0.5, { duration: 10000, easing: cubicInOut });
@@ -109,6 +116,12 @@
 				>
 					{isLoading ? 'Searching...' : 'Search'}
 				</button>
+				{#if displayedResults === 0}
+					<h3 class="whitespace-pre font-sans">
+						Or browse by provider: <a href={'/met'}>Metropolitan Museum of Art</a>
+						<a href="/artic">Art Institute of Chicago</a>
+					</h3>
+				{/if}
 			</div>
 
 			{#if error}
@@ -128,7 +141,13 @@
 				>
 					{#each displayedResults as result (result.id)}
 						<a href={`${result.source}/${result.id}`}>
-							<Results {result} isLoading={false} title={result.title} artist={result.creator} medium={result.medium} />
+							<Results
+								{result}
+								isLoading={false}
+								title={result.title}
+								artist={result.creator}
+								medium={result.medium}
+							/>
 						</a>
 					{/each}
 				</div>
@@ -168,7 +187,7 @@
 					class="mt-8 w-full rounded-md bg-gray-100 p-4 text-center text-gray-700"
 					transition:fade
 				>
-					No results found for "{query}"
+					Search for "{query}"
 				</div>
 			{/if}
 		</div>

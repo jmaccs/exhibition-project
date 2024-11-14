@@ -190,7 +190,9 @@ function standardizeArtworkData(data, source) {
 
 const api = {
 	searchArtworks,
-	standardizeArtworkData
+	standardizeArtworkData,
+	searchArtic,
+	searchMet
 };
 
 export default api;
