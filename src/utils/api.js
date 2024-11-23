@@ -3,6 +3,8 @@ const metSearchEndpoint = 'https://collectionapi.metmuseum.org/public/collection
 const metRecordEndpoint = 'https://collectionapi.metmuseum.org/public/collection/v1/objects';
 const articSearchEndpoint = `${articEndpoint}/search?q=`;
 
+
+
 async function searchArtworks(query) {
 	try {
 		if (query === '*') {
@@ -10,7 +12,7 @@ async function searchArtworks(query) {
 			const metRes = await fetch(`${metRecordEndpoint}`);
 			const articData = await articRes.json();
 			const metData = await metRes.json();
-
+		
 			return {
 				results: articData.data + metData,
 				total: articData.pagination.total + metData.total
@@ -46,6 +48,7 @@ async function searchArtic(query) {
 		const response = await fetch(`${articSearchEndpoint}${params}`);
 		if (!response.ok) throw new Error(`Art Institute of Chicago API error: ${response.status}`);
 		const data = await response.json();
+
 		return {
 			results: data.data.map((data) => standardizeArtworkData(data, 'artic')),
 			total: data.pagination?.total || 0
@@ -66,13 +69,16 @@ async function searchMet(query) {
 		const searchQuery = searchParams.toString();
 		console.log(searchQuery);
 		const response = await fetch(`${metSearchEndpoint}?${searchQuery}`);
-
+		const valid = await fetch(`${metRecordEndpoint}`)
+		const validres = await valid.json()
+		const validIds = validres.objectIDs
 		if (!response.ok) throw new Error(`Met Search API error: ${response.status}`);
 		const data = await response.json();
-		console.log('response', response, 'data', data);
+		console.log('response', response, 'validIds', validIds);
+		
 		let objectIds = (data.objectIDs || [])
 			.slice(0, 100)
-			.filter((id) => id && typeof id === 'number');
+			.filter((id) => id && typeof id === 'number' && validIds.includes(id));
 
 		const details = await Promise.all(
 			objectIds.map(async (id) => {
@@ -80,7 +86,7 @@ async function searchMet(query) {
 					const detailResponse = await fetch(`${metRecordEndpoint}/${id}`);
 
 					const detailData = await detailResponse.json();
-			
+
 					return detailData;
 				} catch (error) {
 					console.error(`Error fetching details for Met ID ${id}:`, error);
@@ -88,7 +94,7 @@ async function searchMet(query) {
 				}
 			})
 		);
-	
+
 		const results = details.map((data) => standardizeArtworkData(data, 'met'));
 
 		return {
@@ -114,14 +120,16 @@ function standardizeArtworkData(data, source) {
 		rights: '',
 		medium: '',
 		boost: false,
-		link: ''
+		link: '',
+		origin: ''
 	};
 
 	switch (source) {
 		case 'artic':
+			
 			return {
 				...baseData,
-				id: data.id,
+				id: parseInt(data.id),
 				title: data.title || 'Untitled',
 				creator: data.artist_title || data.artist_display || 'Unknown',
 				description: data.description || data.publication_history || data.exhibition_history || '',
@@ -136,6 +144,7 @@ function standardizeArtworkData(data, source) {
 				medium: data.medium_display || '',
 				boost: data.is_boosted || false,
 				link: `https://www.artic.edu/artworks/${data.id}`,
+				origin: data.place_of_origin || '',
 				filters: {
 					classification_titles: data.classification_titles || []
 				}
@@ -144,17 +153,18 @@ function standardizeArtworkData(data, source) {
 		case 'met':
 			return {
 				...baseData,
-				id: data.objectID,
+				id: parseInt(data.objectID),
 				title: data.title || 'Untitled',
 				creator: data.artistDisplayName || 'Unknown',
 				description: data.period || data.period + ', ' + data.creditLine || '',
-				image: data.primaryImage  || data.primaryImageSmall || null,
+				image: data.primaryImage || data.primaryImageSmall || null,
 				thumbnail: data.primaryImageSmall || data.primaryImage || null,
 				provider: 'The Metropolitan Museum of Art',
 				rights: data.rightsAndReproduction || '',
 				medium: data.medium || '',
 				boost: data.isHighlight || false,
-				link: `https://www.metmuseum.org/art/collection/search/${data.objectID}`
+				link: `https://www.metmuseum.org/art/collection/search/${data.objectID}`,
+				origin: data.city || data.country || ''
 			};
 
 		default:
@@ -162,32 +172,28 @@ function standardizeArtworkData(data, source) {
 	}
 }
 function interleaveResults(provider1Results, provider2Results) {
-    const mergedResults = [];
-    let i = 0, j = 0;
-    const randomnessFactor = 0.5
+	const mergedResults = [];
+	let i = 0,
+		j = 0;
+	const randomnessFactor = 0.5;
 
-    while (i < provider1Results.length || j < provider2Results.length) {
-       
-        if (i < provider1Results.length && j < provider2Results.length) {
-            const chooseFromApi1 = Math.random() < randomnessFactor
-                ? false 
-                : i / (i + j + 1) < 0.5; 
+	while (i < provider1Results.length || j < provider2Results.length) {
+		if (i < provider1Results.length && j < provider2Results.length) {
+			const chooseFromApi1 = Math.random() < randomnessFactor ? false : i / (i + j + 1) < 0.5;
 
-            if (chooseFromApi1) {
-                mergedResults.push(provider1Results[i++]);
-            } else {
-                mergedResults.push(provider2Results[j++]);
-            }
-        } 
+			if (chooseFromApi1) {
+				mergedResults.push(provider1Results[i++]);
+			} else {
+				mergedResults.push(provider2Results[j++]);
+			}
+		} else if (i < provider1Results.length) {
+			mergedResults.push(provider1Results[i++]);
+		} else if (j < provider2Results.length) {
+			mergedResults.push(provider2Results[j++]);
+		}
+	}
 
-        else if (i < provider1Results.length) {
-            mergedResults.push(provider1Results[i++]);
-        } else if (j < provider2Results.length) {
-            mergedResults.push(provider2Results[j++]);
-        }
-    }
-
-    return mergedResults;
+	return mergedResults;
 }
 const api = {
 	searchArtworks,

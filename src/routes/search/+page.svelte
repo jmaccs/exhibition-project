@@ -18,7 +18,7 @@
 
 	let showSearch = $state(true);
 	let selectedArtwork = $state(null);
-
+	
 	let totalPages = $derived(Math.ceil(allResults.length / itemsPerPage));
 	let displayedResults = $derived.by(() => {
 		if (filter === '')
@@ -36,7 +36,12 @@
 				(result) => result.medium && result.medium.toLowerCase().includes(query.toLowerCase())
 			);
 	});
-	$inspect(displayedResults);
+
+	export const snapshot = {
+		capture: () => allResults,
+		restore: (value) => (allResults = value)
+	};
+
 	const progress = tweened(0.5, { duration: 10000, easing: cubicInOut });
 
 	async function handleSearch(event) {
@@ -88,6 +93,7 @@
 
 	onMount(async () => {
 		try {
+			if (allResults.length > 0) return;
 			const res = await api.searchArtworks('*');
 			allApiObjects = res.total;
 			console.log(res.results[0]);
@@ -138,7 +144,7 @@
 			{:else if displayedResults.length > 0}
 				<select
 					id="filter-select"
-					class="mb-4 h-10 w-auto rounded-md border border-gray-200 bg-white mx-auto font-sans text-sm text-gray-800 focus:border-stone-300 focus:outline-none focus:ring-2 focus:ring-stone-200"
+					class="mx-auto mb-4 h-10 w-auto rounded-md border border-gray-200 bg-white font-sans text-sm text-gray-800 focus:border-stone-300 focus:outline-none focus:ring-2 focus:ring-stone-200"
 					bind:value={filter}
 				>
 					<option value="">-Filter Results-</option>

@@ -1,11 +1,28 @@
 <script>
     import { onMount } from 'svelte';
     import { browser } from '$app/environment';
+    import api from '../../utils/api';
     let { data } = $props();
     let grid;
     let Muuri;
+    let fullData = []
+    $inspect(data.collection);
 
+    async function fetchFullData() {
+        if(data.collection.length > 0) {
+         fullData = await Promise.all(data.collection.map(async (artwork) => {
+            const id = artwork.sourceId;
+            const req = artwork.source === 'artic' ? `https://api.artic.edu/api/v1/artworks/${id}` : `https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}`;
+            const res = await fetch(req);
+            const artworkData = await res.json();
+            const cleanedArtwork = api.standardizeArtworkData(artworkData, artwork.source);
+            return cleanedArtwork;
+        }));
+            
+    }
+}
     onMount(async () => {
+        fetchFullData();
         if (browser) {
           
             const muuriModule = await import('muuri');

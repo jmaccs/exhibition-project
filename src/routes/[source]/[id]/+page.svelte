@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	let { data } = $props();
+	
 	let formMessage = $state('');
 	let formError = $state(false);
 	let isSubmitting = $state(false);

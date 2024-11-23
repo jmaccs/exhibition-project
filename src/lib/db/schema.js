@@ -28,6 +28,7 @@ export const artworks = sqliteTable('artworks', {
   title: text('title').notNull(),
   creator: text('creator'),
   thumbnail: text('thumbnail'),
+  sourceId: integer('sourceId').notNull(),
   source: text('source').notNull(), // 'artic' or 'met'
   createdAt: text('created_at')
     .notNull()

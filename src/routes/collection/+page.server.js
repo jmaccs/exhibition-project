@@ -17,7 +17,8 @@ export async function load({ parent }) {
                 title: artworks.title,
                 creator: artworks.creator,
                 thumbnail: artworks.thumbnail,
-                source: artworks.source
+                source: artworks.source,
+                sourceId: artworks.sourceId
             })
             .from(userCollections)
             .innerJoin(artworks, eq(userCollections.artworkId, artworks.id))
