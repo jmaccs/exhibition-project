@@ -36,7 +36,7 @@
 				(result) => result.medium && result.medium.toLowerCase().includes(query.toLowerCase())
 			);
 	});
-
+	$inspect(displayedResults);
 	const progress = tweened(0.5, { duration: 10000, easing: cubicInOut });
 
 	async function handleSearch(event) {
@@ -50,13 +50,14 @@
 		error = null;
 
 		try {
-			const searchData = await api.searchArtworks(query, filter);
+			const searchData = await api.searchArtworks(query);
 			allResults = searchData.results;
+
 			currentPage = 1;
 		} catch (err) {
 			console.error('Search error:', err);
 			if (err.message.includes('401') || err.message.includes('403')) {
-				error = 'API authentication error. Please check your API key.';
+				error = 'API authentication error.';
 			} else if (err.message.includes('CORS')) {
 				error =
 					'CORS error: Unable to access the API. Please check the API endpoint configuration.';
@@ -135,6 +136,16 @@
 					<Spinner />
 				</div>
 			{:else if displayedResults.length > 0}
+				<select
+					id="filter-select"
+					class="mb-4 h-10 w-auto rounded-md border border-gray-200 bg-white mx-auto font-sans text-sm text-gray-800 focus:border-stone-300 focus:outline-none focus:ring-2 focus:ring-stone-200"
+					bind:value={filter}
+				>
+					<option value="">-Filter Results-</option>
+					<option value="artist">Artist</option>
+					<option value="title">Title</option>
+					<option value="medium">Medium</option>
+				</select>
 				<div
 					class="mt-8 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4"
 					transition:fade
@@ -151,16 +162,7 @@
 						</a>
 					{/each}
 				</div>
-				<select
-					id="filter-select"
-					class="mb-4 h-10 w-auto rounded-md border border-gray-200 bg-white px-4 py-2 font-sans text-sm text-gray-800 focus:border-stone-300 focus:outline-none focus:ring-2 focus:ring-stone-200"
-					bind:value={filter}
-				>
-					<option value="">-Filter Results-</option>
-					<option value="artist">Artist</option>
-					<option value="title">Title</option>
-					<option value="medium">Medium</option>
-				</select>
+
 				<div class="mt-4 flex items-center justify-center gap-4">
 					<button
 						class="rounded-md bg-gray-200 px-4 py-2 hover:bg-gray-300 disabled:opacity-50"

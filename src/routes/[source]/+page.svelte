@@ -45,7 +45,7 @@
         <div class="flex justify-center my-8">
             <button
                 class="rounded-md bg-gray-100 px-6 py-2 text-gray-700 hover:bg-gray-200 disabled:opacity-50"
-                on:click={loadMore}
+                onclick={loadMore}
                 disabled={isLoading}
             >
                 {isLoading ? 'Loading...' : 'Load More'}

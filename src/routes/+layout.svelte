@@ -17,7 +17,7 @@
 </script>
 
 <header class="sticky inset-x-0 top-0 h-32 z-20 bg-white p-3 font-sans shadow">
-    <nav class="flex w-full max-w-2xl pb-20 align-middle md:pt-16">
+    <nav class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4 md:pt-16">
         <a class="p-4 hover:text-slate-200" href="/">home</a>
         <a class="p-4 hover:text-slate-200" href="/search">search</a>
         {#if user}
