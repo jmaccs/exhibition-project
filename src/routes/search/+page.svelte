@@ -7,7 +7,7 @@
 	import Results from '$lib/components/Results.svelte';
 	import Spinner from '$lib/components/Spinner.svelte';
 
-	let allApiObjects = $state(0);
+	let allApiObjects = $state('public');
 	let filter = $state('');
 	let query = $state('');
 	let allResults = $state([]);
@@ -123,11 +123,10 @@
 				>
 					{isLoading ? 'Searching...' : 'Search'}
 				</button>
-				{#if displayedResults === 0}
-					<h3 class="whitespace-pre font-sans">
-						Or browse by provider: <a href={'/met'}>Metropolitan Museum of Art</a>
-						<a href="/artic">Art Institute of Chicago</a>
-					</h3>
+				{#if filter !== '' && displayedResults.length === 0}				<h3 class="mt-4 w-full rounded-md bg-red-100 p-4 text-red-700" transition:fade>
+					No results with current filters
+				</h3>
+					<button onclick={filter = ''} class="p-2 mt-2 bg-gray-200 border">Clear Filters</button>
 				{/if}
 			</div>
 
@@ -152,6 +151,7 @@
 					<option value="title">Title</option>
 					<option value="medium">Medium</option>
 				</select>
+	
 				<div
 					class="mt-8 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4"
 					transition:fade
@@ -160,6 +160,7 @@
 						<a href={`${result.source}/${result.id}`}>
 							<Results
 								{result}
+							
 								isLoading={false}
 								title={result.title}
 								artist={result.creator}

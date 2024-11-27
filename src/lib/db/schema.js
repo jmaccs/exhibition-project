@@ -11,16 +11,13 @@ export const users = sqliteTable('users', {
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
+  userAuthToken: text('userAuthToken').notNull().unique(),
   createdAt: text('created_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text('updated_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`)
-});
-
-export const emailIndex = sqliteTable('email_idx', {
-    email: text('email').notNull().unique()
 });
 
 export const artworks = sqliteTable('artworks', {

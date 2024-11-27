@@ -10,7 +10,7 @@
     function handleLogout() {
         return async ({ result }) => {
             if (result.type === 'success') {
-                await goto('/');
+                window.location.href = '/';
             }
         };
     }
@@ -21,18 +21,22 @@
         <a class="p-4 hover:text-slate-200" href="/">home</a>
         <a class="p-4 hover:text-slate-200" href="/search">search</a>
         {#if user}
-        <a class="p-4 hover:text-slate-200" href="/collection">collection</a>
+            <a class="p-4 hover:text-slate-200" href="/collection">collection</a>
             <div class="justify-self-end items-center ml-auto">
-               
                 <form action="/logout" method="POST" use:enhance={handleLogout}>
-                    <button class="p-4 hover:text-slate-200">logout</button>
+                    <button type="submit" class="p-4 hover:text-slate-200">
+                        logout
+                    </button>
                 </form>
             </div>
         {:else}
-            <a class="p-4 justify-self-end hover:text-slate-200 ml-auto" href="/login">login | sign up</a>
+            <a class="p-4 justify-self-end hover:text-slate-200 ml-auto" href="/login">
+                login | sign up
+            </a>
         {/if}
     </nav>
 </header>
+
 <div class="flex w-full flex-col items-center justify-center p-4">
     {@render children()}
 </div>

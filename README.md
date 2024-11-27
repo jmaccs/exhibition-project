@@ -1,6 +1,8 @@
 # ArtFetch
 
-ArtFetch is a Svelte 5 web application that lets users explore, search, and curate art from prominent museums. ArtFetch connects to the **Metropolitan Museum of Art** and the **Art Institute of Chicago** APIs for artwork search, displays results on a draggable image board, and allows users to save collections of their favorite works. User data is stored in a Turso database, managed with Drizzle ORM.
+Live hosted version viewable at [text](https://exhibition-project-two.vercel.app/)
+
+
 
 ## Features
 

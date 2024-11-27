@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS user_collections;
+DROP TABLE IF EXISTS artworks;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS email_idx;

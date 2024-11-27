@@ -3,7 +3,7 @@ import { db } from '$lib/db/db';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
 import { users } from '$lib/db/schema';
-import { createJWT } from '$lib/jwt';
+import { randomUUID } from 'crypto';
 
 export const actions = {
     login: async ({ request, cookies }) => {
@@ -35,21 +35,25 @@ export const actions = {
                 return fail(401, { message: 'Invalid email or password' });
             }
 
-            const token = createJWT({
-                id: user.id,
-                email: user.email,
-                name: user.name
-            });
+            // Generate new auth token and update user
+            const newAuthToken = randomUUID();
+            await db
+                .update(users)
+                .set({ 
+                    userAuthToken: newAuthToken,
+                    updatedAt: new Date().toISOString()
+                })
+                .where(eq(users.id, user.id));
 
-            cookies.set('authToken', token, {
+            cookies.set('session', newAuthToken, {
                 path: '/',
                 httpOnly: true,
                 sameSite: 'strict',
                 secure: process.env.NODE_ENV === 'production',
-                maxAge: 60 * 60 * 24 * 30 
+                maxAge: 60 * 60 * 24 * 30 // 30 days
             });
 
-            console.log(`User logged in successfully: ${email}`);
+            // Return success to show success message before redirect
             return { success: true };
         } catch (error) {
             console.error('Login error:', error);
@@ -69,7 +73,6 @@ export const actions = {
         }
 
         try {
-       
             const [existingUser] = await db
                 .select()
                 .from(users)
@@ -83,34 +86,27 @@ export const actions = {
 
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
+            const authToken = randomUUID();
 
-            const [newUser] = await db
+            const result = await db
                 .insert(users)
                 .values({
                     email,
                     name,
-                    password: hashedPassword
+                    password: hashedPassword,
+                    userAuthToken: authToken,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
                 })
-                .returning({
-                    id: users.id,
-                    email: users.email,
-                    name: users.name
-                });
+                .returning();
 
+            const newUser = result[0];
             if (!newUser || !newUser.id) {
                 console.error('Failed to create new user in database');
                 return fail(500, { message: 'Failed to create user account' });
             }
 
-          
-            const token = createJWT({
-                id: newUser.id,
-                email: newUser.email,
-                name: newUser.name
-            });
-
-          
-            cookies.set('authToken', token, {
+            cookies.set('session', authToken, {
                 path: '/',
                 httpOnly: true,
                 sameSite: 'strict',
@@ -119,6 +115,7 @@ export const actions = {
             });
 
             console.log(`User signed up successfully: ${email}`);
+            // Return success to show success message before redirect
             return { success: true };
         } catch (error) {
             console.error('Signup error:', error);

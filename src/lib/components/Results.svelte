@@ -1,13 +1,17 @@
 <script>
+	 import { scale } from "svelte/transition";
+	 import { quintOut } from "svelte/easing";
 	let { result, isLoading } = $props();
+	
 </script>
 
-<div class="relative rounded-lg border shadow-sm transition-shadow hover:shadow-md">
+<div class="relative rounded-lg border shadow-sm hover:shadow-md">
 	<div class="aspect-square relative bg-gray-100">
-		<div class="overflow-hidden rounded-lg border shadow-sm transition-shadow hover:shadow-md">
-			{#if result.thumbnail}
+		<div class="overflow-hidden rounded-lg border shadow-sm hover:shadow-md">
+			{#if result.thumbnail && !isLoading}
 				<img
 					src={result.thumbnail}
+					transition:scale={{ delay: 250, duration: 300, easing: quintOut }}
 					alt={result.title}
 					class="h-48 w-full object-cover"
 					onerror={(e) => (e.target.src = 'https://via.placeholder.com/300x200?text=No+Image')}
