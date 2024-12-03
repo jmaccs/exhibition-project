@@ -67,14 +67,14 @@ async function searchMet(query) {
 		});
 
 		const searchQuery = searchParams.toString();
-		console.log(searchQuery);
+
 		const response = await fetch(`${metSearchEndpoint}?${searchQuery}`);
 		const valid = await fetch(`${metRecordEndpoint}`)
 		const validres = await valid.json()
 		const validIds = validres.objectIDs
 		if (!response.ok) throw new Error(`Met Search API error: ${response.status}`);
 		const data = await response.json();
-		console.log('response', response, 'validIds', validIds);
+
 		
 		let objectIds = (data.objectIDs || [])
 			.slice(0, 100)

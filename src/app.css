@@ -6,5 +6,12 @@
     font-family: Catrinity;
     font-style: normal;
     font-weight: 400;
-    src: url('/fonts/Catrinity-Regular.otf') format('otf');
+    src: url('/fonts/Catrinity.otf') format('otf');
+}
+
+@font-face {
+    font-family: Quivira;
+    font-style: normal;
+    font-weight: 400;
+    src: url('/fonts/Quivira.otf') format('otf');
 }

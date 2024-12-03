@@ -9,19 +9,24 @@ export default {
 
 	theme: {
 		fontFamily: {
-			'sans': ['Catrinity', "sans-serif"],
+			sans: ['Catrinity', 'sans-serif'],
+			serif: ['Quivira', 'serif']
 		},
 		extend: {
-			animation: {
-				scroll: 'slide 1s infinite linear',
-			  },
-			  keyframes: {
+			keyframes: {
 				slide: {
-				  '0%': { transform: 'translateY(0)' },
-				  '100%': { transform: 'translateY(-100%)' },
+					'0%': { transform: 'translateY(0)' },
+					'100%': { transform: 'translateY(-100%)' }
 				},
-			  },
-			
+				scrolling: {
+					'0%': {
+						transform: 'translateX(0)'
+					},
+					'100%': {
+						transform: 'translateX(-100%)'
+					}
+				}
+			}
 		}
 	},
 

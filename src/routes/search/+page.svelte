@@ -1,4 +1,5 @@
 <script>
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { tweened } from 'svelte/motion';
 	import { cubicInOut } from 'svelte/easing';
@@ -7,7 +8,7 @@
 	import Results from '$lib/components/Results.svelte';
 	import Spinner from '$lib/components/Spinner.svelte';
 
-	let allApiObjects = $state('public');
+	let allApiObjects = $derived($page.data.allApiObjects);
 	let filter = $state('');
 	let query = $state('');
 	let allResults = $state([]);
@@ -18,7 +19,7 @@
 
 	let showSearch = $state(true);
 	let selectedArtwork = $state(null);
-	
+
 	let totalPages = $derived(Math.ceil(allResults.length / itemsPerPage));
 	let displayedResults = $derived.by(() => {
 		if (filter === '')
@@ -90,18 +91,6 @@
 		selectedArtwork = artwork;
 		showSearch = false;
 	}
-
-	onMount(async () => {
-		try {
-			if (allResults.length > 0) return;
-			const res = await api.searchArtworks('*');
-			allApiObjects = res.total;
-			console.log(res.results[0]);
-		} catch (err) {
-			console.error('Error fetching total artworks:', err);
-			allApiObjects = 0;
-		}
-	});
 </script>
 
 <div class="flex h-full w-full flex-col items-center p-16">
@@ -123,10 +112,11 @@
 				>
 					{isLoading ? 'Searching...' : 'Search'}
 				</button>
-				{#if filter !== '' && displayedResults.length === 0}				<h3 class="mt-4 w-full rounded-md bg-red-100 p-4 text-red-700" transition:fade>
-					No results with current filters
-				</h3>
-					<button onclick={filter = ''} class="p-2 mt-2 bg-gray-200 border">Clear Filters</button>
+				{#if filter !== '' && displayedResults.length === 0}
+					<h3 class="mt-4 w-full rounded-md bg-red-100 p-4 text-red-700" transition:fade>
+						No results with current filters
+					</h3>
+					<button onclick={(filter = '')} class="mt-2 border bg-gray-200 p-2">Clear Filters</button>
 				{/if}
 			</div>
 
@@ -151,7 +141,7 @@
 					<option value="title">Title</option>
 					<option value="medium">Medium</option>
 				</select>
-	
+
 				<div
 					class="mt-8 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4"
 					transition:fade
@@ -160,7 +150,6 @@
 						<a href={`${result.source}/${result.id}`}>
 							<Results
 								{result}
-							
 								isLoading={false}
 								title={result.title}
 								artist={result.creator}

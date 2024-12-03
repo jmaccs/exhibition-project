@@ -23,7 +23,7 @@ export async function load({ parent }) {
             .from(userCollections)
             .innerJoin(artworks, eq(userCollections.artworkId, artworks.id))
             .where(eq(userCollections.userId, user.id));
-
+           
         return {
             collection
         };

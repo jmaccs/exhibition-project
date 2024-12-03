@@ -1,11 +1,17 @@
+
 import { db } from '$lib/db/db';
 import { eq } from 'drizzle-orm';
 import { users } from '$lib/db/schema';
 
 /** @type {import('@sveltejs/kit').Handle} */
-export async function handle({ event, resolve }) {
+export const handle = async ({ event, resolve }) => {
+
+
     const session = event.cookies.get('session');
-    
+    if (!session) {
+
+        return await resolve(event)
+      }
     if (session) {
         try {
             const [user] = await db
@@ -31,6 +37,5 @@ export async function handle({ event, resolve }) {
         }
     }
 
-    const response = await resolve(event);
-    return response;
-}
+    return await resolve(event);
+};

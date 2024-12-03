@@ -7,36 +7,35 @@
     let { children } = $props();
     let user = $derived($page.data.user);
 
-    function handleLogout() {
-        return async ({ result }) => {
-            if (result.type === 'success') {
-                window.location.href = '/';
-            }
-        };
-    }
+ 
 </script>
 
 <header class="sticky inset-x-0 top-0 h-32 z-20 bg-white p-3 font-sans shadow">
     <nav class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4 md:pt-16">
-        <a class="p-4 hover:text-slate-200" href="/">home</a>
-        <a class="p-4 hover:text-slate-200" href="/search">search</a>
+        <div class="justify-self-start">
+        <a class="p-4 hover:text-slate-200 " href="/">home</a>
+        <a class="p-4 hover:text-slate-200 " href="/search">search</a>
+    </div>
         {#if user}
-            <a class="p-4 hover:text-slate-200" href="/collection">collection</a>
+            <a class="p-4 hover:text-slate-200 justify-self-start" href="/collection">collection</a>
             <div class="justify-self-end items-center ml-auto">
-                <form action="/logout" method="POST" use:enhance={handleLogout}>
-                    <button type="submit" class="p-4 hover:text-slate-200">
-                        logout
-                    </button>
-                </form>
+                <form action="/logout" method="POST" use:enhance >
+                    <button class="font-sans hover:text-gray-600" type="submit">Log out</button>
+                  </form>
             </div>
         {:else}
-            <a class="p-4 justify-self-end hover:text-slate-200 ml-auto" href="/login">
-                login | sign up
+        <div class="p-4">
+            <a class="justify-self-end hover:text-slate-200 ml-auto" href="/login">
+                login | 
             </a>
+            <a class="justify-self-end hover:text-slate-200 ml-auto" href="/register">
+                 sign up
+            </a>
+        </div>
         {/if}
     </nav>
 </header>
 
-<div class="flex w-full flex-col items-center justify-center p-4">
+<div class="flex w-full items-center justify-center p-4">
     {@render children()}
 </div>
