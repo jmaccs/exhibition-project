@@ -17,7 +17,7 @@
 	});
 </script>
 
-<div class="relative h-16 w-16 self-end object-contain">
+<div class="relative p-4 h-24 w-24 self-end object-contain">
 	<a href="/">
 		<canvas bind:this={canvas} width={16} height={16}></canvas>
 	</a>

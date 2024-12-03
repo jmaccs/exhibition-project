@@ -13,7 +13,7 @@
 <header class="sticky inset-x-0 top-0 z-20 bg-white shadow">
 	<nav class="mx-auto flex max-w-screen-xl items-baseline justify-between px-2">
 		<Logo />
-		<div class="flex items-baseline gap-2">
+		<div class="flex items-baseline gap-x-2">
 			<div class="flex items-baseline">
 				<a class="p-4 font-sans hover:text-slate-200" href="/">home</a>
 				<svg

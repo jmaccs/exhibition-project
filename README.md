@@ -1,4 +1,4 @@
-# ArtFetch
+# Palette
 
 Live hosted version viewable at [text](https://exhibition-project-two.vercel.app/)
 
@@ -23,11 +23,11 @@ Live hosted version viewable at [text](https://exhibition-project-two.vercel.app
 
 ## Screenshots
 
-> *(Add screenshots of the app here)*
+ ![alt text](screenshot.png)
 
 ## Getting Started
 
-Follow these instructions to run ArtFetch locally.
+Follow these instructions to run Palette locally.
 
 ### Prerequisites
 
@@ -69,13 +69,13 @@ Follow these instructions to run ArtFetch locally.
     npm run dev
     ```
 
-6. **Access ArtFetch:**
+6. **Access Palette:**
 
-    Open [http://localhost:5173](http://localhost:5173) in your browser to start using ArtFetch.
+    Open [http://localhost:5173](http://localhost:5173) in your browser to start using Palette.
 
 ### Deployment
 
-ArtFetch can be deployed to any platform that supports Node.js. Make sure to set your environment variables for production:
+Palette can be deployed to any platform that supports Node.js. Make sure to set your environment variables for production:
 
 - **TURSO_DB_AUTH_TOKEN** and **TURSO_DB_URL** for the database connection.
 
