@@ -1,6 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import Spinner from '$lib/components/Spinner.svelte';
+
 	import { typewriter } from '../utils/transition';
 	let user = $derived($page.data.user);
 	let randomArt = $derived($page.data.thumbnails);
@@ -8,13 +9,13 @@
 
 	let innerWidth = $state(0);
 
-	let i = $state(-1);
 	const messages = [
 		'A database of thousands of the greatest works of art produced by mankind.......',
 		'A blisteringly powerful search at your fingertips.......',
 		'Curate your own (virtual) collection of priceless masterworks.......',
 		'Sign up, now!'
 	];
+	let i = $state(-1);
 	$effect(() => {
 		const interval = setInterval(() => {
 			i += 1;
@@ -28,7 +29,6 @@
 			clearInterval(interval);
 		};
 	});
-	$inspect(randomArt);
 </script>
 
 <svelte:window bind:innerWidth />
@@ -36,19 +36,21 @@
 <div class="h-full w-full px-4 py-8">
 	<div class="h-32">
 		{#if user}
-			<span class="p-4 text-stone-600">
-				Hello,
+			<span class="p-4 font-sans text-stone-600">
+				Hello
+
 				<a
 					href="/collection"
-					class="text-bold font-serif text-blue m-8 rounded-lg border bg-blue-200 px-6 py-2 text-lg shadow-sm ring-2 ring-yellow-200 hover:animate-pulse"
+					class="text-bold font-serif text-blue m-8 rounded-full border bg-zinc-300 px-6 py-1 text-lg shadow-sm ring-2 ring-blue-200 hover:animate-pulse hover:ring-blue-600"
 				>
 					{user.name}
+					<br />
 				</a>
 			</span>
 		{:else}
 			<span class="m-8 p-4 text-stone-600">
 				{#key i}
-					<a href='register' class="font-serif" in:typewriter={{ speed: 1 }}>
+					<a href="register" class="font-serif" in:typewriter={{ speed: 1 }}>
 						{messages[i] || ''}
 					</a>
 				{/key}
@@ -93,6 +95,7 @@
 	* {
 		margin: 0;
 	}
+
 	.carousel-container {
 		width: 90%;
 		max-width: 1536px;

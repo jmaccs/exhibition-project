@@ -44,66 +44,69 @@
 				<CollectionCarousel {userCollection} />
 			</div>
 		{:else if !showSlideShowLoader}
-			<div class="artwork" transition:fly={{ y: 200, duration: 1000 }}>
-				<div class="artwork-bg">
-				<ArtworkGrid artworks={userCollection} />
-			</div>
+			<div class="artwork-container" transition:fly={{ y: 200, duration: 1000 }}>
+				<div class="artwork-frame">
+					<div class="artwork-bg">
+						<div class="artwork-content">
+							<ArtworkGrid artworks={userCollection} />
+						</div>
+					</div>
+				</div>
 			</div>
 		{/if}
 	{/if}
 </div>
 
 <style>
-	.artwork {
-  background-color:#ddc;
-  border:solid 5vmin #eee;
-  border-bottom-color:#fff;
-  border-left-color:#eee;
-  border-radius:2px;
-  border-right-color:#eee;
-  border-top-color:#ddd;
-  box-shadow:0 0 5px 0 rgba(0,0,0,.25) inset, 0 5px 10px 5px rgba(0,0,0,.25);
-  box-sizing:border-box;
-  display:inline-block;
-  margin:1vh 1vw;
-  max-height: max-content;
-  max-width: max-content;
-  padding:8vmin;
-  position:relative;
-  text-align:center;
-  &:before {
-    border-radius:2px;
-    bottom:-2vmin;
-    box-shadow:0 2px 5px 0 rgba(0,0,0,.25) inset;
-    content:"";
-    left:-2vmin;
-	max-width: 1280px;
-    position:absolute;
-    right:-2vmin;
-    top:-2vmin;
-  }
-  &:after {
-    border-radius:2px;
-    bottom:-2.5vmin;
-    box-shadow: 0 2px 5px 0 rgba(0,0,0,.25);
-    content:"";
-    left:-2.5vmin;
-    position:absolute;
-    right:-2.5vmin;
-    top:-2.5vmin;
-  }
-}
-	.artwork-bg {
-		
-		max-height: max-content;
-		padding: 40px;
-		max-width: 2048px;
+	.artwork-container {
+		position: relative;
+		display: inline-block;
+		max-width: 100%;
+	}
 
+	.artwork-frame {
+		background-color: #ddc;
+		border: solid 5vmin #eee;
+		border-bottom-color: #fff;
+		border-left-color: #eee;
+		border-radius: 2px;
+		border-right-color: #eee;
+		border-top-color: #ddd;
+		box-shadow: 0 0 5px 0 rgba(0,0,0,.25) inset, 0 5px 10px 5px rgba(0,0,0,.25);
+		box-sizing: border-box;
+		padding: 8vmin;
+		position: relative;
+	}
+
+	.artwork-frame:before {
+		border-radius: 2px;
+		bottom: -2vmin;
+		box-shadow: 0 2px 5px 0 rgba(0,0,0,.25) inset;
+		content: "";
+		left: -2vmin;
+		position: absolute;
+		right: -2vmin;
+		top: -2vmin;
+	}
+
+	.artwork-frame:after {
+		border-radius: 2px;
+		bottom: -2.5vmin;
+		box-shadow: 0 2px 5px 0 rgba(0,0,0,.25);
+		content: "";
+		left: -2.5vmin;
+		position: absolute;
+		right: -2.5vmin;
+		top: -2.5vmin;
+	}
+
+	.artwork-bg {
+		padding: 40px;
+		position: relative;
 		--s: 84px;
 		--c1: #f2f2f2;
 		--c2: #cdcbcc;
 		--c3: #999999;
-
 		--_g: 0 120deg, #0000 0;
 		background: conic-gradient(at calc(250% / 3) calc(100% / 3), var(--c3) var(--_g)),
 			conic-gradient(from -120deg at calc(50% / 3) calc(100% / 3), var(--c2) var(--_g)),
@@ -118,7 +121,10 @@
 				var(--c3) 0
 			);
 		background-size: calc(var(--s) * sqrt(3)) var(--s);
-		overflow: hidden;
+	}
 
+	.artwork-content {
+		position: relative;
+		z-index: 1;
 	}
 </style>

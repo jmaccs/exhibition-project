@@ -13,6 +13,7 @@ export default {
 			serif: ['Quivira', 'serif']
 		},
 		extend: {
+			
 			keyframes: {
 				slide: {
 					'0%': { transform: 'translateY(0)' },

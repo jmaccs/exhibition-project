@@ -52,7 +52,7 @@
 		{/each}
 	</div>
 	<div class="controls">
-		<p class="text-sm text-gray-600">
+		<p class="text-sm font-serif text-gray-600">
 			Space to pause/play • Arrow keys to navigate
 		</p>
 	</div>

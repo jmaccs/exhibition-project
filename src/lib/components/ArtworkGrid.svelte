@@ -4,11 +4,11 @@
 
 <div class="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
 	{#each artworks as artwork (artwork.id)}
-		<button class="relative rounded-lg" role="menuitem" tabindex="0">
+		<div class="relative rounded-lg" role="menuitem">
 			<div
 				class="relative flex-auto rounded-lg shadow-sm backdrop-blur-md transition-shadow hover:shadow-md"
 			>
-				<a href={artwork.source + '/' + artwork.sourceId}>
+				<a class="relative block" href={artwork.source + '/' + artwork.sourceId}>
 					{#if artwork.thumbnail}
 						<img
 							src={artwork.thumbnail}
@@ -36,7 +36,7 @@
 					</div>
 				</a>
 			</div>
-		</button>
+		</div>
 	{/each}
 </div>
 
