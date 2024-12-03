@@ -40,20 +40,61 @@
 			</button>
 		</div>
 		{#if showSlideShowLoader}
-			<div class="container h-96 max-w-7xl" transition:fade={{ duration: 500 }}>
+			<div class="container h-[600px] max-w-7xl" transition:fade={{ duration: 500 }}>
 				<CollectionCarousel {userCollection} />
 			</div>
 		{:else if !showSlideShowLoader}
-			<div class="artwork-bg" transition:fly={{ y: 200, duration: 1000 }}>
+			<div class="artwork" transition:fly={{ y: 200, duration: 1000 }}>
+				<div class="artwork-bg">
 				<ArtworkGrid artworks={userCollection} />
+			</div>
 			</div>
 		{/if}
 	{/if}
 </div>
 
 <style>
+	.artwork {
+  background-color:#ddc;
+  border:solid 5vmin #eee;
+  border-bottom-color:#fff;
+  border-left-color:#eee;
+  border-radius:2px;
+  border-right-color:#eee;
+  border-top-color:#ddd;
+  box-shadow:0 0 5px 0 rgba(0,0,0,.25) inset, 0 5px 10px 5px rgba(0,0,0,.25);
+  box-sizing:border-box;
+  display:inline-block;
+  margin:1vh 1vw;
+  max-height: max-content;
+  max-width: max-content;
+  padding:8vmin;
+  position:relative;
+  text-align:center;
+  &:before {
+    border-radius:2px;
+    bottom:-2vmin;
+    box-shadow:0 2px 5px 0 rgba(0,0,0,.25) inset;
+    content:"";
+    left:-2vmin;
+	max-width: 1280px;
+    position:absolute;
+    right:-2vmin;
+    top:-2vmin;
+  }
+  &:after {
+    border-radius:2px;
+    bottom:-2.5vmin;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.25);
+    content:"";
+    left:-2.5vmin;
+    position:absolute;
+    right:-2.5vmin;
+    top:-2.5vmin;
+  }
+}
 	.artwork-bg {
-		height: 200vh;
+		
 		max-height: max-content;
 		padding: 40px;
 		max-width: 2048px;
@@ -78,22 +119,6 @@
 			);
 		background-size: calc(var(--s) * sqrt(3)) var(--s);
 		overflow: hidden;
-		mask-image: linear-gradient(
-				to bottom,
-				rgba(0, 0, 0, 0),
-				rgba(0, 0, 0, 1) 2%,
-				rgba(0, 0, 0, 1) 98%,
-				rgba(0, 0, 0, 0)
-			),
-			linear-gradient(
-				to right,
-				rgba(0, 0, 0, 0),
-				rgba(0, 0, 0, 1) 2%,
-				rgba(0, 0, 0, 1) 98%,
-				rgba(0, 0, 0, 0)
-			);
 
-		mask-composite: intersect; /* For some browsers */
-		-webkit-mask-composite: destination-in;
 	}
 </style>

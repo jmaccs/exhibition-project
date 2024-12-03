@@ -2,188 +2,148 @@
 	import { onMount } from 'svelte';
 	import { spring } from 'svelte/motion';
 
-	/** @type {Array<{ title: string, thumbnail: string }>} */
 	let { userCollection } = $props();
-	let stage;
-	let activeIndex = $state(0)
-	let dragStart = $state(null);
-
-	let lastIndex = $derived(userCollection.length - 1);
-	const angle = 20;
-
+	let length = $derived(userCollection.length)
+	let sliderStyle = $derived(`--quantity: ${length}`)
 	
-	const rotation = spring(0, {
-		stiffness: 0.1,
-		damping: 0.4
-	});
-
-	function handleDragStart(e) {
-		dragStart = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+	let isRotating = $state(true);
+	let currentRotation = $state(0);
+	
+	function toggleRotation() {
+		isRotating = !isRotating;
 	}
 
-	function handleDragEnd(e) {
-		if (!dragStart) return;
-		
-		const currentX = e.type === 'touchend' ? e.changedTouches[0].clientX : e.clientX;
-		const diff = currentX - dragStart;
-		
-		if (Math.abs(diff) > 10) {
-			moveSlide(diff > 0 ? 'prev' : 'next');
-		}
-		
-		dragStart = null;
-	}
-
-	function handleKeyDown(event) {
-		if (event.key === 'ArrowRight') {
-			moveSlide('next');
-		} else if (event.key === 'ArrowLeft') {
-			moveSlide('prev');
+	function handleKeydown(event) {
+		if (event.key === 'ArrowLeft') {
+			currentRotation += 360/length;
+		} else if (event.key === 'ArrowRight') {
+			currentRotation -= 360/length;
+		} else if (event.key === ' ') {
+			toggleRotation();
 		}
 	}
 
-	function moveSlide(side) {
-		if ((side === 'next' && activeIndex < lastIndex) || (side === 'prev' && activeIndex > 0)) {
-			side === 'next' ? activeIndex++ : activeIndex--;
-			const multiplier = side === 'next' ? 1 : -1;
-			rotation.set($rotation + (multiplier * angle));
+	$effect(() => {
+		if (isRotating) {
+			const interval = setInterval(() => {
+				currentRotation -= 1;
+			}, 50);
+			return () => clearInterval(interval);
 		}
-	}
-
-	onMount(() => {
-		stage.addEventListener('keydown', handleKeyDown);
-		return () => {
-			stage.removeEventListener('keydown', handleKeyDown);
-		};
 	});
 </script>
 
-<div class="stage" 
-	bind:this={stage}
-	tabindex="0"
-	onmousedown={handleDragStart}
-	onmouseup={handleDragEnd}
-	ontouchstart={handleDragStart}
-	ontouchend={handleDragEnd}>
-	<div class="container" style="perspective: 900px;">
-		<div class="ring" style="transform: rotateY({$rotation}deg);">
-			{#each userCollection as artwork, index}
-				<div
-					class="img"
-					class:active={index === activeIndex}
-					data-id={index}
-					style="transform: {`rotateY(${index * -angle}deg) translateZ(-800px)`};"
-				>
-					<img alt={artwork.title} src={artwork.thumbnail} />
-				</div>
-			{/each}
-		</div>
+<svelte:window on:keydown={handleKeydown}/>
+
+<div class="banner">
+	<div 
+		class="slider" 
+		style="{sliderStyle}; --rotation: {currentRotation}deg"
+		on:click={toggleRotation}
+	>
+		{#each userCollection as art, i}
+			{@const style = `--position: ${i+1}`}
+			{@const url = art.thumbnail}
+			{@const alt = art.title}
+			<div class="item" style={style}>
+				<img src={url} alt={alt}>
+			
+			</div>
+		{/each}
 	</div>
-	<div class="buttons">
-		<button 
-			class="prev" 
-			onclick={() => moveSlide('prev')}
-			disabled={activeIndex === 0}
-		>
-			prev
-		</button>
-		<button 
-			class="next"
-			onclick={() => moveSlide('next')}
-			disabled={activeIndex === lastIndex}
-		>
-			next
-		</button>
+	<div class="controls">
+		<p class="text-sm text-gray-600">
+			Space to pause/play • Arrow keys to navigate
+		</p>
 	</div>
 </div>
 
 <style>
-	:global(body) {
-		margin: 0;
-	
-	}
-
-	.stage {
-		position: relative;
-		outline: none;
-		height: 100%;
+	.banner {
 		width: 100%;
-	}
-
-	.container {
+		height: 500px;
+		text-align: center;
 		overflow: hidden;
-		height: 100%;
-	}
-
-	.ring {
-		transform-style: preserve-3d;
-		user-select: none;
 		position: relative;
-		height: 100%;
-		transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+		background: transparent;
 	}
 
-	.img {
-		position: absolute;
-		width: 240px;
-		height: 240px;
-		left: 50%;
-		top: 50%;
-		margin-left: -120px;
-		margin-top: -120px;
-		backface-visibility: hidden;
-		border-radius: 14px;
-		border: 2px solid #5e5e5e;
-		background: linear-gradient(
-			141deg,
-			rgba(217, 217, 217, 0.12) 15.25%,
-			rgba(217, 217, 217, 0) 127.34%
-		);
-		backdrop-filter: blur(74px);
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		transition: all 0.3s ease-out;
-	}
-
-	.img.active {
-		border-color: #007bff;
-		box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
-	}
-
-	.img img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		border-radius: 12px;
-	}
-
-	.buttons {
+	.controls {
 		position: absolute;
 		bottom: 20px;
+		left: 0;
+		right: 0;
+		text-align: center;
+	}
+
+	.slider {
+		position: absolute;
+		width: 200px;
+		height: 250px;
+		top: 50%;
 		left: 50%;
-		transform: translateX(-50%);
-		z-index: 100;
-		display: flex;
-		gap: 1rem;
-	}
-
-	button {
-		padding: 0.5rem 1rem;
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 4px;
-		color: gray;
+		transform-style: preserve-3d;
+		transform: translate(-50%, -50%) perspective(1000px) rotateX(-10deg) rotateY(var(--rotation));
+		z-index: 2;
 		cursor: pointer;
-		transition: all 0.2s ease;
 	}
 
-	button:hover:not(:disabled) {
-		background: rgba(255, 255, 255, 0.2);
+	.slider .item {
+		position: absolute;
+		inset: 0;
+		transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg)) translateZ(400px);
+		transition: transform 0.5s ease;
 	}
 
-	button:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
+	.slider .item:hover {
+		transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg)) translateZ(420px);
+	}
+
+	.slider .item img {
+		width: 60%;
+		height: 60%;
+		object-fit: cover;
+		border-radius: 8px;
+		box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+	}
+
+	/* .caption {
+		position: absolute;
+		bottom: -3px;
+		left: 0;
+		right: 0;
+		text-align: center;
+		color: #4a5568;
+		font-size: 0.875rem;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		padding: 0 5px;
+	} */
+
+	@media screen and (max-width: 1023px) {
+		.slider {
+			width: 160px;
+			height: 200px;
+		}
+		.slider .item {
+			transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg)) translateZ(300px);
+		}
+		.slider .item:hover {
+			transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg)) translateZ(320px);
+		}
+	}
+
+	@media screen and (max-width: 767px) {
+		.slider {
+			width: 120px;
+			height: 150px;
+		}
+		.slider .item {
+			transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg)) translateZ(200px);
+		}
+		.slider .item:hover {
+			transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg)) translateZ(220px);
+		}
 	}
 </style>

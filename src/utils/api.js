@@ -48,9 +48,9 @@ async function searchArtic(query) {
 		const response = await fetch(`${articSearchEndpoint}${params}`);
 		if (!response.ok) throw new Error(`Art Institute of Chicago API error: ${response.status}`);
 		const data = await response.json();
-
+		const filteredData = data.data.filter(item => item.id !== 1584 && item.id !== 116400 && item.id !== 5585);
 		return {
-			results: data.data.map((data) => standardizeArtworkData(data, 'artic')),
+			results: filteredData.map((data) => standardizeArtworkData(data, 'artic')),
 			total: data.pagination?.total || 0
 		};
 	} catch (error) {

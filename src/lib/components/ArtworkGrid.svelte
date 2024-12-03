@@ -1,14 +1,14 @@
 <script>
 	let { artworks } = $props();
 </script>
+
 <div class="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-
 	{#each artworks as artwork (artwork.id)}
-
-			<button class="relative rounded-lg" role="menuitem" tabindex="0">
-				<div
-					class="relative rounded-lg shadow-sm flex-auto backdrop-blur-md transition-shadow hover:shadow-md"
-				>
+		<button class="relative rounded-lg" role="menuitem" tabindex="0">
+			<div
+				class="relative flex-auto rounded-lg shadow-sm backdrop-blur-md transition-shadow hover:shadow-md"
+			>
+				<a href={artwork.source + '/' + artwork.sourceId}>
 					{#if artwork.thumbnail}
 						<img
 							src={artwork.thumbnail}
@@ -25,21 +25,21 @@
 						</div>
 					{/if}
 					<div class="p-3">
-						<h3 class="font-serif line-clamp-2 text-sm" title={artwork.title}>
+						<h3 class="font-serif line-clamp-2 text-xs" title={artwork.title}>
 							{artwork.title}
 						</h3>
 						{#if artwork.creator}
-							<p class="font-serif mt-1 text-xs text-gray-600">
+							<p class="font-serif mt-1 text-[0.5rem] text-gray-600">
 								By {artwork.creator}
 							</p>
 						{/if}
 					</div>
-				</div>
-			</button>
-	
+				</a>
+			</div>
+		</button>
 	{/each}
-
 </div>
+
 <style>
 	.artwork-card:hover img {
 		@apply scale-[1.01];

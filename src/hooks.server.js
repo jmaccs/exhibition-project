@@ -13,6 +13,7 @@ export const handle = async ({ event, resolve }) => {
         return await resolve(event)
       }
     if (session) {
+      
         try {
             const [user] = await db
                 .select({
@@ -35,6 +36,7 @@ export const handle = async ({ event, resolve }) => {
             console.error('Session verification error:', error);
             event.cookies.delete('session', { path: '/' });
         }
+    
     }
 
     return await resolve(event);
