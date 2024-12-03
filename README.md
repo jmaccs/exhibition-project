@@ -1,6 +1,6 @@
 # Palette
 
-Live hosted version viewable at [text](https://exhibition-project-two.vercel.app/)
+Live hosted version viewable at [https://exhibition-project-two.vercel.app/](https://exhibition-project-two.vercel.app/)
 
 
 
