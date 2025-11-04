@@ -17,24 +17,18 @@
 	});
 </script>
 
-<div class="relative p-4 h-24 w-24 self-end object-contain">
-	<a href="/">
-		<canvas bind:this={canvas} width={16} height={16}></canvas>
+<div class="relative h-10 w-10 md:h-12 md:w-12 flex items-baseline">
+	<a href="/" class="block h-full w-full">
+		<canvas bind:this={canvas} class="h-full w-full" width={16} height={16}></canvas>
 	</a>
 </div>
 
 <style>
 	canvas {
 		position: absolute;
-		left: 0;
-		bottom: 0;
-		margin-bottom: 0;
-		width: 100%;
-		height: 100%;
+		inset: 0;
 		background-color: #666;
-		mask: url(./palette.svg) 50% 50% no-repeat;
-		mask-size: 10vmin;
-		-webkit-mask: url(./palette.svg) 50% 50% no-repeat;
-		-webkit-mask-size: 10vmin;
+		mask: url(./palette.svg) center / contain no-repeat;
+		-webkit-mask: url(./palette.svg) center / contain no-repeat;
 	}
 </style>
