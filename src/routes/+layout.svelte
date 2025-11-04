@@ -1,17 +1,17 @@
 <script>
 	import '../app.css';
 	import { enhance } from '$app/forms';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import Spinner from '$lib/components/Spinner.svelte';
 	import Logo from '$lib/components/Logo.svelte';
 	let { children } = $props();
-	let user = $derived($page.data.user);
+	let user = $derived(page.data.user);
 	let isLoggingOut = $state(false);
 </script>
 
 <header class="sticky inset-x-0 top-0 z-20 bg-white shadow">
-	<nav class="mx-auto flex max-w-screen-xl items-baseline justify-between px-2">
+	<nav class="mx-auto flex max-w-screen-xl items-center justify-between px-2 py-1">
 		<Logo />
 		<div class="flex items-baseline gap-x-2">
 			<div class="flex items-baseline">
